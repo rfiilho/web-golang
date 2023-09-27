@@ -54,3 +54,13 @@ func NovoProduto(nome, descricao string, preco float64, quantidade int) []Produt
 	defer db.Close()
 	return nil
 }
+
+func DelProduto(id string) {
+	db := db.Connect()
+	delProduto, err := db.Prepare("delete from produtos where id = $1")
+	if err != nil {
+		panic(err.Error())
+	}
+	delProduto.Exec(id)
+	defer db.Close()
+}
