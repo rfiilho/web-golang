@@ -14,7 +14,7 @@ type Produto struct {
 
 func GetProdutos() []Produto {
 	db := db.Connect()
-	query, err := db.Query("select * from produtos")
+	query, err := db.Query("select * from produtos order by id asc")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -62,5 +62,45 @@ func DelProduto(id string) {
 		panic(err.Error())
 	}
 	delProduto.Exec(id)
+	defer db.Close()
+}
+
+func EditProduto(id string) Produto {
+	db := db.Connect()
+	produtoBanco, err := db.Query("select * from produtos where id = $1", id)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	produtoParaAtualizar := Produto{}
+
+	for produtoBanco.Next() {
+		var id, quantidade int
+		var nome, descricao string
+		var preco float64
+
+		err = produtoBanco.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		produtoParaAtualizar.Id = id
+		produtoParaAtualizar.Nome = nome
+		produtoParaAtualizar.Desc = descricao
+		produtoParaAtualizar.Preco = preco
+		produtoParaAtualizar.Qtd = quantidade
+	}
+	defer db.Close()
+	return produtoParaAtualizar
+
+}
+
+func UpdateProduto(id int, nome, descricao string, preco float64, quantidade int) {
+	db := db.Connect()
+	updateProduto, err := db.Prepare("update produtos set nome=$1, descricao=$2, preco=$3, qtd=$4 where id=$5")
+	if err != nil {
+		panic(err.Error())
+	}
+	updateProduto.Exec(nome, descricao, preco, quantidade, id)
 	defer db.Close()
 }

@@ -21,6 +21,7 @@
                             <td>{{.Desc}}</td>
                             <td>{{.Preco}}</td>
                             <td>{{.Qtd}}</td>
+                            <td><a href="/edit?id={{.Id}}" class="btn btn-info">Editar</a></td>
                             <td><a href="#@" class="btn btn-danger" onclick="onDelete('{{.Id}}')">Excluir</a></td>
                         </tr>
                         {{end}}
